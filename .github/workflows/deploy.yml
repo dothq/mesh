@@ -60,7 +60,7 @@ jobs:
                   install -m 600 -D /dev/null ~/.ssh/id_rsa
                   echo "${{ secrets.CI_PRIVATE_KEY }}" > ~/.ssh/id_rsa
                   SERVER_IP="$(tailscale ip -6 ${{ env.SERVER_HOSTNAME }})"
-                  ssh-keyscan $MACHINE_IP > ~/.ssh/known_hosts
+                  ssh-keyscan $SERVER_IP > ~/.ssh/known_hosts
 
             - name: Connect over SSH and deploy
               run: |
