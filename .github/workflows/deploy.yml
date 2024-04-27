@@ -35,35 +35,35 @@ jobs:
                   done
                   yarn test
 
-    # Staging deployments
-    deploy-staging:
-        runs-on: ubuntu-latest
-        needs: build
-        if: github.ref == 'refs/heads/staging'
-        environment:
-            name: Staging
-            url: "http://dothq.local"
-        permissions:
-            contents: read
+    # # Staging deployments
+    # deploy-staging:
+    #     runs-on: ubuntu-latest
+    #     needs: build
+    #     if: github.ref == 'refs/heads/staging'
+    #     environment:
+    #         name: Staging
+    #         url: "http://dothq.local"
+    #     permissions:
+    #         contents: read
 
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v4
+    #     steps:
+    #         - name: Checkout repository
+    #           uses: actions/checkout@v4
 
-            - name: Deploy to staging server
-              uses: ./.github/actions/run-via-ssh
-              with:
-                  ts_hostname: ${{ vars.SERVER_HOSTNAME }}
-                  ts_oauth_client_id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
-                  ts_oauth_secret: ${{ secrets.TS_OAUTH_SECRET }}
-                  ts_tags: tag:ci
-                  ssh_username: ci
-                  ssh_private_key: ${{ secrets.SERVER_CI_PRIVATE_KEY }}
-                  run: |
-                      cd /app
-                      git reset --hard
-                      git pull
-                      ./scripts/rebuild_docker.sh
+    #         - name: Deploy to staging server
+    #           uses: ./.github/actions/run-via-ssh
+    #           with:
+    #               ts_hostname: ${{ vars.SERVER_HOSTNAME }}
+    #               ts_oauth_client_id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+    #               ts_oauth_secret: ${{ secrets.TS_OAUTH_SECRET }}
+    #               ts_tags: tag:ci
+    #               ssh_username: ci
+    #               ssh_private_key: ${{ secrets.SERVER_CI_PRIVATE_KEY }}
+    #               run: |
+    #                   cd /app
+    #                   git reset --hard
+    #                   git pull
+    #                   ./scripts/rebuild_docker.sh
 
     # Production deployments
     deploy-production:
