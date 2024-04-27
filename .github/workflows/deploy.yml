@@ -58,7 +58,7 @@ jobs:
                   ts_oauth_secret: ${{ secrets.TS_OAUTH_SECRET }}
                   ts_tags: tag:ci
                   ssh_username: ci
-                  ssh_private_key: ${{ secrets.CI_PRIVATE_KEY }}
+                  ssh_private_key: ${{ secrets.SERVER_CI_PRIVATE_KEY }}
                   run: |
                       cd /app
                       git reset --hard
@@ -88,7 +88,7 @@ jobs:
                   ts_oauth_secret: ${{ secrets.TS_OAUTH_SECRET }}
                   ts_tags: tag:ci
                   ssh_username: ci
-                  ssh_private_key: ${{ secrets.CI_PRIVATE_KEY }}
+                  ssh_private_key: ${{ secrets.SERVER_CI_PRIVATE_KEY }}
                   run: |
                       cd /app
                       git reset --hard
