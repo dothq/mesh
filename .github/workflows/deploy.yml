@@ -48,24 +48,17 @@ jobs:
             - name: Checkout repository
               uses: actions/checkout@v4
 
-            - name: Connect to Tailscale network
-              uses: tailscale/github-action@v2
+            - name: Deploy to production server
+              uses: ./.github/actions/run-via-ssh
               with:
-                  oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
-                  oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
-                  tags: tag:ci
-
-            - name: Install SSH key
-              run: |
-                  install -m 600 -D /dev/null ~/.ssh/id_rsa
-                  echo "${{ secrets.CI_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-                  SERVER_IP="$(tailscale ip -6 ${{ env.SERVER_HOSTNAME }})"
-                  ssh-keyscan $SERVER_IP > ~/.ssh/known_hosts
-
-            - name: Connect over SSH and deploy
-              run: |
-                  SERVER_IP="$(tailscale ip -6 ${{ env.SERVER_HOSTNAME }})"
-                  ssh -t ci@$SERVER_IP "cd /app && git reset --hard && git pull && ./scripts/rebuild_docker.sh"
-
-            - name: Nuke SSH keys
-              run: rm -rf ~/.ssh
+                  ts_hostname: ${{ env.SERVER_HOSTNAME }}
+                  ts_oauth_client_id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+                  ts_oauth_secret: ${{ secrets.TS_OAUTH_SECRET }}
+                  ts_tags: tag:ci
+                  ssh_username: ci
+                  ssh_private_key: ${{ secrets.CI_PRIVATE_KEY }}
+                  run: |
+                      cd /app
+                      git reset --hard
+                      git pull
+                      ./scripts/rebuild_docker.sh

@@ -1,0 +1,51 @@
+name: "Run via SSH"
+description: "Connects securely to a server over Tailscale and runs a shell script."
+inputs:
+    ts_hostname:
+        description: "Tailscale server hostname to use"
+        required: true
+    ts_oauth_client_id:
+        description: "Tailscale OAuth2 client ID to use"
+        required: true
+    ts_oauth_secret:
+        description: "Tailscale OAuth2 secret to use"
+        required: true
+    ts_tags:
+        description: "Tailscale tags to use."
+        default: ""
+        required: false
+    ssh_username:
+        description: "SSH username to use."
+        required: true
+    ssh_private_key:
+        description: "SSH private key to use."
+        required: true
+    run:
+        description: "Shell script to execute"
+        required: true
+
+runs:
+    using: "composite"
+    steps:
+        - name: Connect to Tailscale network
+          uses: tailscale/github-action@v2
+          with:
+              oauth-client-id: ${{ inputs.ts_oauth_client_id }}
+              oauth-secret: ${{ inputs.ts_oauth_secret }}
+              tags: ${{ inputs.ts_tags }}
+
+        - name: Install SSH key
+          shell: bash --noprofile --norc -eo pipefail -ux {0}
+          run: |
+              install -m 600 -D /dev/null ~/.ssh/id_rsa
+              echo "${{ inputs.ssh_private_key }}" > ~/.ssh/id_rsa
+              SERVER_IP="$(tailscale ip -6 ${{ inputs.ts_hostname }})"
+              ssh-keyscan $SERVER_IP > ~/.ssh/known_hosts
+
+        - name: Run script
+          shell: bash --noprofile --norc -eo pipefail -ux {0}
+          run: ssh -t ${{ inputs.ssh_username }}@${{ inputs.ts_hostname }} "${{ inputs.run }}"
+
+        - name: Nuke SSH keys
+          shell: bash --noprofile --norc -eo pipefail -ux {0}
+          run: rm -rf ~/.ssh
