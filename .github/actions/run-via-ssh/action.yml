@@ -52,6 +52,8 @@ runs:
           shell: bash --noprofile --norc -eo pipefail {0}
           run: |
               SERVER_IP="$(tailscale ip -6 ${{ inputs.ts_hostname }})"
+
+              echo "Connecting to server over SSH on ${{ inputs.ssh_username }}@$SERVER_IP..."
               ssh -t ${{ inputs.ssh_username }}@$SERVER_IP "${{ inputs.run }}"
 
         - name: Nuke SSH keys
