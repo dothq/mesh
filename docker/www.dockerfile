@@ -6,7 +6,7 @@ COPY . .
 
 RUN apk add git
 
-RUN npm install
-RUN npm run build
+RUN yarn
+RUN yarn build
 
 ENTRYPOINT ["node", ".scalar/main.js"]
